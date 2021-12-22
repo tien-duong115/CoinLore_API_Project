@@ -107,6 +107,7 @@ def create_SparkSession():
     return spark
 
 
+
 def binance_BtcUSDT_minute(data):
     """[
         - Take data CSV format and manipulate the spark dataframe
