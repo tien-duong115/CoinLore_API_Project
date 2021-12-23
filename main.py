@@ -34,17 +34,19 @@ def main():
     exchange_requests = get_request(GET_all_exchanges)
     exchange_data = exchange_data_filter(exchange_requests)
     export_csv(exchange_data,coin_exchange_path)
-
+    print("Sucessfully get data and export out to {coin_exchange_path}!")
 
     # coins data pipeline 
     coin_requests= get_coin_request(start=1, limit=7000)
     export_csv(coin_requests, coin_path)
+    print("Sucessfully get data and export out to {coin_path}!")
 
 
     # coin's market data pipeline
     coin_market_data = get_coin_market_request(HowMany=25, DataPath=coin_path)
     export_csv(coin_market_data, coin_market_path)
-    
+    print("Sucessfully get data and export out to {coin_market_path}!")
+
     
     # Stage binance 1 minutes data to s3
     upload_to_s3(bucketname=bucket_name, local_file_path=binance_btc_file, s3_file_path=binance_btc_file)
