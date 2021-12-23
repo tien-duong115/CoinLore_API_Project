@@ -2,10 +2,6 @@ from os import write
 import requests
 from requests.api import request
 import pandas as pd
-import csv, json
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import *
-import pyspark.sql.functions as F
 
 
 
@@ -92,47 +88,3 @@ def exchange_data_filter(data):
     payload = payload.astype({'id':int}).copy()
     payload = df = payload[['id','name', 'name_id', 'url','country','date_live', 'date_added', 'usdt','fiat','auto','volume_usd','udate','volume_usd_adj']].sort_values(by=['id']).set_index('id').query("country != '' ")
     return payload
-
-
-def create_SparkSession():
-    """[summary]
-
-    Returns:
-        [type]: [description]
-    """
-    spark = SparkSession.builder.\
-    config("spark.jars.repositories", "https://repos.spark-packages.org/").\
-    config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
-    enableHiveSupport().getOrCreate()
-    return spark
-
-
-
-def binance_BtcUSDT_minute(data):
-    """[
-        - Take data CSV format and manipulate the spark dataframe
-        - Capitalize first letter of each column
-        - Round float to ceil and single digit
-        ]
-
-    Args:
-        data ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    spark = create_SparkSession()
-    payload = spark.read.option('header', True).csv(data)
-    payload = payload.select([F.col(col).alias(col.replace(' ','_')) for col in payload.columns])
-    payload = payload.toDF(*[i.capitalize() for i in payload.columns])
-    
-    collect_columns=['Open', 'High', 'Low','Close', 'Volume_btc', 'Tradecount', 'Volume_usdt']
-    
-    for col1 in payload.columns:
-        for col2 in collect_columns:
-            if col1==col2:
-                payload = payload.withColumn(col1, round(col1, 1))
-    return payload
-
-
-
