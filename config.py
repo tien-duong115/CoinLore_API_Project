@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 from botocore.exceptions import ClientError
 import boto3
+from pyspark.sql import SparkSession
+
 
 load_dotenv()
 
@@ -19,7 +21,6 @@ DWH_DB_PASSWORD        = os.getenv("DWH_DB_PASSWORD")
 DWH_PORT               = os.getenv("DWH_PORT")
 
 DWH_IAM_ROLE_NAME      = os.getenv("DWH_IAM_ROLE_NAME")
-
 
 
 ec2 = boto3.resource('ec2',
@@ -44,3 +45,13 @@ redshift = boto3.client('redshift',
                        aws_access_key_id=KEY,
                        aws_secret_access_key=SECRET
                        )
+
+spark = SparkSession.builder.\
+   config("spark.jars.repositories", "https://repos.spark-packages.org/").\
+   config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
+   enableHiveSupport().getOrCreate()
+
+
+session = boto3.Session(
+   aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+   aws_secret_access_key= os.getenv('AWS_SECRET_ACCESS_KEY'))

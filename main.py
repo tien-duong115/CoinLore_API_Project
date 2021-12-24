@@ -5,6 +5,7 @@ from spark_functions import *
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import config as c
 
 
 
@@ -15,13 +16,13 @@ def main():
     """
     
     load_dotenv()
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key= os.getenv('AWS_SECRET_ACCESS_KEY')
+    aws_access_key_id=c.KEY
+    aws_secret_access_key= c.SECRET
     s3_bucket_name = os.getenv('S3_BUCKET_NAME')
         
     # Create S3 session
     bucket_name=s3_bucket_name
-    create_boto3_session(aws_key=aws_access_key_id, aws_secret_key=aws_secret_access_key)
+    c.session(aws_key=aws_access_key_id, aws_secret_key=aws_secret_access_key)
     
     # file paths
     coin_path = 'data/coins_data.csv'
@@ -67,6 +68,8 @@ def main():
     print(f"Successfully Uploaded {coin_exchange_path}to S3!")
 
 
-
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(e)

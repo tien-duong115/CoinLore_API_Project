@@ -9,7 +9,6 @@ import config as c
 
 def main():
     
-    
     status = 'deleting'
     c.redshift.delete_cluster( ClusterIdentifier=c.DWH_CLUSTER_IDENTIFIER, SkipFinalClusterSnapshot=True)
     c.iam.detach_role_policy(RoleName=c.DWH_IAM_ROLE_NAME, PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
