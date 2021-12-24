@@ -2,60 +2,38 @@ from dotenv import load_dotenv
 import os
 from botocore.exceptions import ClientError
 import boto3
-
-load_dotenv()
-
-
-KEY                    = os.getenv('AWS_ACCESS_KEY_ID')
-SECRET                 = os.getenv('AWS_SECRET_ACCESS_KEY')
-
-DWH_CLUSTER_TYPE       = os.getenv("DWH_CLUSTER_TYPE")
-DWH_NUM_NODES          = os.getenv("DWH_NUM_NODES")
-DWH_NODE_TYPE          = os.getenv("DWH_NODE_TYPE")
-
-DWH_CLUSTER_IDENTIFIER = os.getenv("DWH_CLUSTER_IDENTIFIER")
-DWH_DB                 = os.getenv("DWH_DB")
-DWH_DB_USER            = os.getenv("DWH_DB_USER")
-DWH_DB_PASSWORD        = os.getenv("DWH_DB_PASSWORD")
-DWH_PORT               = os.getenv("DWH_PORT")
-
-DWH_IAM_ROLE_NAME      = os.getenv("DWH_IAM_ROLE_NAME")
-
-
-
-ec2 = boto3.resource('ec2',
-                       region_name="us-west-2",
-                       aws_access_key_id=KEY,
-                       aws_secret_access_key=SECRET
-                    )
-
-s3 = boto3.resource('s3',
-                       region_name="us-west-2",
-                       aws_access_key_id=KEY,
-                       aws_secret_access_key=SECRET
-                   )
-
-iam = boto3.client('iam',aws_access_key_id=KEY,
-                     aws_secret_access_key=SECRET,
-                     region_name='us-west-2'
-                  )
-
-redshift = boto3.client('redshift',
-                       region_name="us-west-2",
-                       aws_access_key_id=KEY,
-                       aws_secret_access_key=SECRET
-                       )
-
+import time
+import pandas as pd
+from pandas_functions import prettyRedshiftProps
+import config as c
 
 def main():
-    try:    
-        redshift.delete_cluster( ClusterIdentifier=DWH_CLUSTER_IDENTIFIER,  SkipFinalClusterSnapshot=True)
-        iam.detach_role_policy(RoleName=DWH_IAM_ROLE_NAME, PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
-        iam.delete_role(RoleName=DWH_IAM_ROLE_NAME)
-        print(f"\n\nDeleting {DWH_CLUSTER_IDENTIFIER}!\nPlease Check again!\n\n")
-    except Exception as e:
-        print(f'\n{e}\n')
-        
-        
+    
+    
+    status = 'deleting'
+    c.redshift.delete_cluster( ClusterIdentifier=c.DWH_CLUSTER_IDENTIFIER, SkipFinalClusterSnapshot=True)
+    c.iam.detach_role_policy(RoleName=c.DWH_IAM_ROLE_NAME, PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
+    c.iam.delete_role(RoleName=c.DWH_IAM_ROLE_NAME)
+    while True:
+        time.sleep(5)
+        myClusterProps = c.redshift.describe_clusters(ClusterIdentifier=c.DWH_CLUSTER_IDENTIFIER)['Clusters'][0]
+        cluster_df = prettyRedshiftProps(myClusterProps)
+        check_status = cluster_df['Value'][2]
+        # check_status = cluster_df['Value'][2]
+        delete_time = 0
+        try:
+            if check_status == status:
+                delete_time += 5
+                print(f'\n\nDeleting Cluster: {delete_time} seconds.\n\n')
+                print(f'\n\n>>> Cluster status: {check_status}!\n')
+        except Exception as e:
+            if e == e:
+                print('\n\n>>> Cluster deleted!\n')
+                break
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        if e ==e:
+            print('\n\n>>> No cluster found!\n>>> Cluster deleted!\n\n')

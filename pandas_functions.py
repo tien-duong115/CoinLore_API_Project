@@ -88,3 +88,10 @@ def exchange_data_filter(data):
     payload = payload.astype({'id':int}).copy()
     payload = df = payload[['id','name', 'name_id', 'url','country','date_live', 'date_added', 'usdt','fiat','auto','volume_usd','udate','volume_usd_adj']].sort_values(by=['id']).set_index('id').query("country != '' ")
     return payload
+
+
+def prettyRedshiftProps(props):
+    pd.set_option('display.max_colwidth', -1)
+    keysToShow = ["ClusterIdentifier", "NodeType", "ClusterStatus", "MasterUsername", "DBName", "Endpoint", "NumberOfNodes", 'VpcId']
+    x = [(k, v) for k,v in props.items() if k in keysToShow]
+    return pd.DataFrame(data=x, columns=["Key", "Value"])
