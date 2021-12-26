@@ -23,6 +23,13 @@ DWH_PORT               = os.getenv("DWH_PORT")
 DWH_IAM_ROLE_NAME      = os.getenv("DWH_IAM_ROLE_NAME")
 
 
+DB_HOST_NAME = os.getenv("HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PORT = os.getenv("DB_PORT")
+S3_BUCKET_NAME=os.getenv('S3_BUCKET_NAME')
+
 ec2 = boto3.resource('ec2',
                        region_name="us-west-2",
                        aws_access_key_id=KEY,

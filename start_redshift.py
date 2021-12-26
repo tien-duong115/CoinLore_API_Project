@@ -6,6 +6,7 @@ import json
 import time
 from pandas_functions import prettyRedshiftProps
 import config as c
+from contextlib import redirect_stdout
 
 
 # (DWH_DB_USER, DWH_DB_PASSWORD, DWH_DB)
@@ -22,28 +23,12 @@ print(pd.DataFrame({"Param":
 print("\n\n")
 
 
-ec2 = boto3.resource('ec2',
-                       region_name="us-west-2",
-                       aws_access_key_id=c.KEY,
-                       aws_secret_access_key=c.SECRET
-                    )
+ec2 = c.ec2
+s3 = c.s3
+iam = c.iam
+redshift = c.redshift
 
-s3 = boto3.resource('s3',
-                       region_name="us-west-2",
-                       aws_access_key_id=c.KEY,
-                       aws_secret_access_key=c.SECRET
-                   )
 
-iam = boto3.client('iam',aws_access_key_id=c.KEY,
-                     aws_secret_access_key=c.SECRET,
-                     region_name='us-west-2'
-                  )
-
-redshift = boto3.client('redshift',
-                       region_name="us-west-2",
-                       aws_access_key_id=c.KEY,
-                       aws_secret_access_key=c.SECRET
-                       )
 try:
     print("1.1 Creating a new IAM Role") 
     dwhRole = iam.create_role(
@@ -142,3 +127,10 @@ try:
     )
 except Exception as e:
     print(f"\n>>> {e}\n\n")
+    
+
+with open('.env_db', 'w') as file:
+    with redirect_stdout(file):
+        print(f'DWH_ENDPOINT={DWH_ENDPOINT}')
+        print(f'DWH_ROLE_ARN={DWH_ROLE_ARN}')
+        print(f'S3_BUCKET_NAME={c.S3_BUCKET_NAME}')
