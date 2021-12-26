@@ -4,7 +4,6 @@ from requests.api import request
 import pandas as pd
 
 
-
 def get_request(url):
     """[
         - Generate Request from input Url

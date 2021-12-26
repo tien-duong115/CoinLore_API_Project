@@ -1,5 +1,7 @@
-credentials.txt
+.
 ./data/
 data/
 .env
 ./__pycache__/
+/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/notebook_redshift.ipynb
+/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/notebook.ipynb

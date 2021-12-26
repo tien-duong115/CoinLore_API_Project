@@ -16,13 +16,11 @@ def main():
     """
     
     load_dotenv()
-    aws_access_key_id=c.KEY
-    aws_secret_access_key= c.SECRET
     s3_bucket_name = os.getenv('S3_BUCKET_NAME')
         
     # Create S3 session
     bucket_name=s3_bucket_name
-    c.session(aws_key=aws_access_key_id, aws_secret_key=aws_secret_access_key)
+    c.session(aws_key=c.KEY, aws_secret_key=c.SECRET)
     
     # file paths
     coin_path = 'data/coins_data.csv'
