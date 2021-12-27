@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from create_table_sql import drop_table_queries, create_table_queries
 
-dotenv_path = Path('.env_db')
+dotenv_path = Path('database/.env_db')
 load_dotenv(dotenv_path)
 
 

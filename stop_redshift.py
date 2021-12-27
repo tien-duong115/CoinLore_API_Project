@@ -19,11 +19,8 @@ def main():
         cluster_df = prettyRedshiftProps(myClusterProps)
         check_status = cluster_df['Value'][2]
         # check_status = cluster_df['Value'][2]
-        delete_time = 0
         try:
             if check_status == status:
-                delete_time += 5
-                print(f'\n\nDeleting Cluster: {delete_time} seconds.\n\n')
                 print(f'\n\n>>> Cluster status: {check_status}!\n')
         except Exception as e:
             if e == e:

@@ -3,8 +3,8 @@
 data/
 .env
 ./__pycache__/
-/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/notebook_redshift.ipynb
-/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/notebook.ipynb
-/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/.env_db/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/notebook_psql_redshift.ipynb
-/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/.env_db
+notebook_redshift.ipynb
+notebook.ipynb
+notebook_psql_redshift.ipynb
 database/test.txt
+database/.env_db

@@ -111,7 +111,7 @@ while True:
     print('Cluster not up yet')
 
 
-with open('.env_db', 'w') as file:
+with open('database/.env_db', 'w') as file:
     with redirect_stdout(file):
         print(f'DWH_ENDPOINT={DWH_ENDPOINT}')
         print(f'DWH_ROLE_ARN={DWH_ROLE_ARN}')
