@@ -20,7 +20,7 @@ binance_stage_table_drop = 'DROP TABLE IF EXISTS binance_data_table'
 coins_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS coins_data_table 
     (
-        id INTEGER PRIMARY KEY sortkey,
+        id INTEGER PRIMARY KEY sortkey
         ,symbol VARCHAR NOT NULL
         ,name VARCHAR NOT NULL
         ,nameid VARCHAR NOT NULL
@@ -60,11 +60,10 @@ CREATE TABLE IF NOT EXISTS exchange_data_table
 """)
 
 
-
 market_stage_table_create = ("""
     CREATE TABLE IF NOT EXISTS market_data_table
     (
-        name VARCHAR PRIMARY KEY SORTKEY
+        name VARCHAR PRIMARY KEY sortkey
         ,base VARCHAR NOT NULL
         ,quote VARCHAR NOT NULL
         ,price FLOAT NOT NULL
@@ -74,6 +73,7 @@ market_stage_table_create = ("""
         ,time VARCHAR NOT NULL
     );
 """)
+
 binance_stage_table_create= ''
 
 
@@ -89,8 +89,15 @@ binance_stage_table_create= ''
 
 
 
-print(f'\n\n{coins_stage_table_create}\n\n')
+# print(f'\n\n{coins_stage_table_create}\n\n')
 
-print(f'{exchange_stage_table_create}\n\n')
+# print(f'{exchange_stage_table_create}\n\n')
 
-print(f'{market_stage_table_create}\n\n')
+# print(f'{market_stage_table_create}\n\n')
+
+drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop]
+create_table_queries = [coins_stage_table_create, exchange_stage_table_create, market_stage_table_create]
+
+
+
+
