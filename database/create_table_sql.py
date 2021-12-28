@@ -1,15 +1,16 @@
+#/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/capstone_venv/bin/python3.8
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+os.chdir("/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/database")
+db_env_path = Path('.env')
+load_dotenv(db_env_path)
 
-dotenv_path = Path('.env_db')
-load_dotenv(dotenv_path)
 
-
-BUCKET_NAME = os.getenv('S3_BUDKET_NAME')
+BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 DWH_ROLE_ARN = os.getenv('DWH_ROLE_ARN')
 DWH_ENDPOINT = os.getenv('DWH_ENDPOINT')
-
+COINS_DATA=os.getenv('COINS_DATA')
 
 coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
 market_stage_table_drop = 'DROP TABLE IF EXISTS market_data_table_stage'
@@ -20,7 +21,7 @@ binance_stage_table_drop = 'DROP TABLE IF EXISTS binance_data_table_stage'
 coins_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS coins_data_table_stage
     (
-        id INTEGER 
+        id  INTEGER
         ,symbol VARCHAR
         ,name VARCHAR
         ,nameid VARCHAR
@@ -74,22 +75,35 @@ market_stage_table_create = ("""
     );
 """)
 
-binance_stage_table_create= ("""
-    CREATE TABLE IF NOT EXISTS binanca_data_table_stage
-    (
-        unix VARCHAR
-        ,date VARCHAR
-        ,symbol VARCHAR
-        ,open VARCHAR
-        ,high
-        ,low
-        ,Volume
-    );
 
+binance_stage_table_create = ("""
+    CREATE TABLE IF NOT EXISTS binance_data_table_stage
+    (
+        Unix VARCHAR 
+        ,Date timestamp
+        ,Symbol VARCHAR
+        ,Open_market VARCHAR
+        ,High FLOAT
+        ,Low FLOAT
+        ,Close FLOAT
+        ,Volume_btc FLOAT
+        ,Volume_usdt FLOAT
+        ,Tradecount INTEGER
+    );
 """)
 
 
-# insert_coin_data_table = """
+
+copy_coins_data_to_redshift = f"""
+COPY coins_data_table_stage
+FROM '{DWH_ROLE_ARN}'
+CREDENTIALS '{COINS_DATA}'
+COMPUPDATE OFF
+DELIMITER ','
+REGION 'us-west-2'
+"""
+
+# copy_coin_data_table = """
 # COPY coins_data_table FROM '{BUCKET_NAME}' 
 # CREDENTIALS '{DWH_ROLE_ARN}'
 # IGNOREHEADER 1
@@ -98,7 +112,9 @@ binance_stage_table_create= ("""
 # ;
 # """
 
+drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop, binance_stage_table_drop]
 
+create_table_queries = [coins_stage_table_create, exchange_stage_table_create, market_stage_table_create, binance_stage_table_create]
 
 
 # print(f'\n\n{coins_stage_table_create}\n\n')
@@ -106,9 +122,6 @@ binance_stage_table_create= ("""
 # print(f'{exchange_stage_table_create}\n\n')
 
 # print(f'{market_stage_table_create}\n\n')
-
-drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop, binance_stage_table_drop]
-create_table_queries = [coins_stage_table_create, exchange_stage_table_create, market_stage_table_create, coins_stage_table_create]
 
 
 # for i in drop_table_queries:

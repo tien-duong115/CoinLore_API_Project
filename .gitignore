@@ -2,9 +2,9 @@
 ./data/
 data/
 .env
-./__pycache__/
+__pycache__
 notebook_redshift.ipynb
 notebook.ipynb
+database/__pycache__
+database/.env
 notebook_psql_redshift.ipynb
-database/test.txt
-database/.env_db

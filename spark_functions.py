@@ -29,6 +29,8 @@ def binance_BtcUSDT_minute(data):
         for col2 in collect_columns:
             if col1==col2:
                 payload = payload.withColumn(col1, round(col1, 1))
+    payload = payload.withColumnRenamed('Open', 'Open_market')
+
     return payload
 
 

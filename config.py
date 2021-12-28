@@ -1,8 +1,8 @@
+#!/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/capstone_venv/bin/python3.8
 from dotenv import load_dotenv
 import os
 import boto3
 from pyspark.sql import SparkSession
-
 
 load_dotenv()
 
@@ -21,13 +21,13 @@ DWH_PORT               = os.getenv("DWH_PORT")
 
 DWH_IAM_ROLE_NAME      = os.getenv("DWH_IAM_ROLE_NAME")
 
-
 DB_HOST_NAME = os.getenv("HOST")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_PORT = os.getenv("DB_PORT")
 S3_BUCKET_NAME=os.getenv('S3_BUCKET_NAME')
+COINS_DATA=os.getenv('COINS_DATA')
 
 ec2 = boto3.resource('ec2',
                        region_name="us-west-2",
@@ -62,3 +62,4 @@ session = boto3.Session(
    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
    aws_secret_access_key= os.getenv('AWS_SECRET_ACCESS_KEY'))
 
+print(COINS_DATA)

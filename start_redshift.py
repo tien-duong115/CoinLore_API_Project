@@ -1,3 +1,4 @@
+#!/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/capstone_venv/bin/python3.8
 import pandas as pd
 import json
 import time
@@ -120,7 +121,7 @@ with open('database/.env_db', 'w') as file:
         print(f'DWB_DB_USER={c.DWH_DB_USER}')
         print(f'DWB_DB_PASSWORD={c.DWH_DB_PASSWORD}')
         print(f'DWH_PORT={c.DWH_PORT}')
-        
+        print(f'COINS_DATA={c.COINS_DATA}')        
 try:
     vpc = ec2.Vpc(id=myClusterProps['VpcId'])
     defaultSg = list(vpc.security_groups.all())[0]
