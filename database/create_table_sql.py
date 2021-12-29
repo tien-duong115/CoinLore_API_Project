@@ -2,15 +2,27 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-os.chdir("/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/database")
-db_env_path = Path('.env')
-load_dotenv(db_env_path)
+my_path = Path('/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/.env')
 
+load_dotenv()
+load_dotenv(my_path)
 
 BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 DWH_ROLE_ARN = os.getenv('DWH_ROLE_ARN')
 DWH_ENDPOINT = os.getenv('DWH_ENDPOINT')
 COINS_DATA=os.getenv('COINS_DATA')
+EXCHANGE_DATA=os.getenv('EXCHANGE_DATA')
+MARKET_DATA=os.getenv('MARKET_DATA')
+BINANCE_DATA=os.getenv('BINANCE_DATA')
+
+# print('\n\n')
+# print(DWH_ENDPOINT)
+# print(DWH_ROLE_ARN)
+# print(COINS_DATA)
+# print(EXCHANGE_DATA)
+# print(MARKET_DATA)
+# print(BINANCE_DATA)
+# print('\n\n')
 
 coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
 market_stage_table_drop = 'DROP TABLE IF EXISTS market_data_table_stage'
@@ -21,10 +33,9 @@ binance_stage_table_drop = 'DROP TABLE IF EXISTS binance_data_table_stage'
 coins_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS coins_data_table_stage
     (
-        id  INTEGER
+        id INTEGER
         ,symbol VARCHAR
         ,name VARCHAR
-        ,nameid VARCHAR
         ,rank FLOAT
         ,price_usd FLOAT
         ,percent_change_24h FLOAT
@@ -44,19 +55,17 @@ CREATE TABLE IF NOT EXISTS coins_data_table_stage
 exchange_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS exchange_data_table_stage
     (
-        id INTEGER 
+        id VARCHAR 
         ,name VARCHAR
-        ,name_id VARCHAR
         ,url VARCHAR
         ,country VARCHAR
         ,date_live VARCHAR
-        ,date_added VARCHAR
-        ,usdt INTEGER
-        ,fiat INTEGER
+        ,usdt VARCHAR
+        ,fiat VARCHAR
         ,auto VARCHAR
-        ,volume_usd FLOAT
+        ,volume_usd VARCHAR
         ,udate VARCHAR
-        ,volume_usd_adj FLOAT
+        ,volume_usd_adj VARCHAR
     );
 """)
 
@@ -92,29 +101,55 @@ binance_stage_table_create = ("""
     );
 """)
 
-
-
 copy_coins_data_to_redshift = f"""
 COPY coins_data_table_stage
-FROM '{DWH_ROLE_ARN}'
-CREDENTIALS '{COINS_DATA}'
+FROM '{COINS_DATA}'
+CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
+IGNOREHEADER 1
 COMPUPDATE OFF
 DELIMITER ','
 REGION 'us-west-2'
 """
 
-# copy_coin_data_table = """
-# COPY coins_data_table FROM '{BUCKET_NAME}' 
-# CREDENTIALS '{DWH_ROLE_ARN}'
-# IGNOREHEADER 1
-# delimiter ',' 
-# blanksasnull
-# ;
-# """
+copy_market_data_to_redshift = f"""
+COPY market_data_table_stage
+FROM '{MARKET_DATA}'
+CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
+IGNOREHEADER 1
+COMPUPDATE OFF
+DELIMITER ','
+REGION 'us-west-2'
+"""
+
+copy_binance_data_to_redshift = f"""
+COPY binance_data_table_stage
+FROM '{BINANCE_DATA}'
+CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
+IGNOREHEADER 1
+COMPUPDATE OFF
+DELIMITER ','
+REGION 'us-west-2'
+"""
+
+copy_exchange_data_to_redshift = f"""
+COPY exchange_data_table_stage(id, name, url, country, date_live, usdt, fiat,auto, volume_usd, udate, volume_usd_adj)
+FROM '{EXCHANGE_DATA}'
+CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
+IGNOREHEADER 1
+FILLRECORD
+EMPTYASNULL
+REMOVEQUOTES
+DELIMITER ','
+REGION 'us-west-2'
+ESCAPE
+"""
+
 
 drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop, binance_stage_table_drop]
 
 create_table_queries = [coins_stage_table_create, exchange_stage_table_create, market_stage_table_create, binance_stage_table_create]
+
+copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_market_data_to_redshift, copy_binance_data_to_redshift]
 
 
 # print(f'\n\n{coins_stage_table_create}\n\n')
@@ -126,7 +161,7 @@ create_table_queries = [coins_stage_table_create, exchange_stage_table_create, m
 
 # for i in drop_table_queries:
 #     print(i)
-# for e in create_table_queries:    
+# for e in copy_table_queries:    
 #     print(e)
 
 
