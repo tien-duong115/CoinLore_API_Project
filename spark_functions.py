@@ -5,7 +5,7 @@ import boto3
 import config as c
 
 
-def binance_BtcUSDT_minute(data, column_to_keep):
+def binance_coins_data(data):
     """[
         - Take data CSV format and manipulate the spark dataframe
         - Capitalize first letter of each column
@@ -17,27 +17,24 @@ def binance_BtcUSDT_minute(data, column_to_keep):
         columns_to_keep:   LIST of columns to keep
 
     Returns:
-        [type]: [description]
+        [Pandas dataFrame]: [converted to pandas dataframe for single csv file export]
     """
-    spark = SparkSession.builder.\
-    config("spark.jars.repositories", "https://repos.spark-packages.org/").\
-    config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
-    enableHiveSupport().getOrCreate()
+    try:
+        # spark = SparkSession.builder.\
+        # config("spark.jars.repositories", "https://repos.spark-packages.org/").\
+        # config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
+        # enableHiveSupport().getOrCreate()
+        my_spark = c.conf_spark()
+        payload = my_spark.read.format("csv").option("header", True).load(data)
+        payload = payload.select([F.col(col).alias(col.replace(' ','_')) for col in payload.columns])
+        payload = payload.toDF(*[i.capitalize() for i in payload.columns])
+        payload = payload.withColumnRenamed('Open', 'Open_price')
+        return payload
+
+    except Exception as e:
+        print(e)
+        
     
-    payload = spark.read.option('header', True).csv(data)
-    payload = payload.select([F.col(col).alias(col.replace(' ','_')) for col in payload.columns])
-    payload = column_to_keep
-    payload = payload.toDF(*[i.capitalize() for i in payload.columns])
-    
-    for col1 in payload.columns:
-        for col2 in payload:
-            if col1==col2:
-                payload = payload.withColumn(col1, round(col1, 1))
-    payload = payload.withColumnRenamed('Open', 'Open_market')
-
-    return payload
-
-
 
 def upload_to_s3(bucketname, local_file_path, s3_file_path):
 

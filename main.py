@@ -41,7 +41,7 @@ def main():
         print('\nFail to GET at {coin_path}\n')
         print(e)
 
-    #coin's market data pipeline
+    #top coins data pipeline
     try:
         top_coins_path = 'data/top_coins.csv'
         coin_market_data = top_rank_coins(HowMany=25)
@@ -51,8 +51,16 @@ def main():
         print('\nFail to GET at {top_coins_path}\n')
         print(e)
 
+    # binance historical coins data clean and export to csv
+    try:
+        historical_data_path = "data/Downloaded_data/*.csv"
+        spark_df = binance_coins_data(historical_data_path)
+        spark_df.write.csv(historical_data)
+    except Exception as e:
+        print(f'\nFail to clean and export {historical_data_path}\n')
+        print(e) 
     
-    #Stage historical 1 minutes data to s3
+    Stage historical 1 minutes data to s3
     try:
         upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=historical_data, s3_file_path=historical_data)
         print(f"Successfully Uploaded {historical_data}to S3!")
@@ -75,7 +83,7 @@ def main():
         print(f"Successfully Uploaded {top_coins_path}to S3!")
     except Exception as e:
         print(f'\nFail to upload {top_coins_path}\n')
-        print(e)
+        print(e)`
     
     # stage coin exchange path into s3
     try:
