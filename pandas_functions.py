@@ -35,7 +35,7 @@ def get_coin_request(start=0, limit=100):
         entry = r['data']
         for line in entry:
             payload = payload.append(line, ignore_index=True)
-            print(f"Successfully request number {i}")
+        print(f"Successfully request number {i}")
     return payload
 
 
@@ -58,9 +58,11 @@ def top_rank_coins(HowMany=10, DataPath='data/coins_data.csv'):
     sort_by_rank = df.sort_values(by='rank')
     top_coins = sort_by_rank.head(HowMany)
     list_of_top_coins = list(top_coins.id)
-    
+    count = 0
     for i in list_of_top_coins:
+        print(f'Sending request to: https://api.coinlore.net/api/coin/markets/?id={i}\n\nRequest number: {count}\n')
         r = requests.get(f'https://api.coinlore.net/api/coin/markets/?id={i}').json()
+        count+=1
         for line in r:
             finalPayload = finalPayload.append(line, ignore_index=True)
     finalPayload['time'] = pd.to_datetime(finalPayload['time'], unit='s')

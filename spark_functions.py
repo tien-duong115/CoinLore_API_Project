@@ -19,7 +19,11 @@ def binance_BtcUSDT_minute(data, column_to_keep):
     Returns:
         [type]: [description]
     """
-    spark = c.spark()
+    spark = SparkSession.builder.\
+    config("spark.jars.repositories", "https://repos.spark-packages.org/").\
+    config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
+    enableHiveSupport().getOrCreate()
+    
     payload = spark.read.option('header', True).csv(data)
     payload = payload.select([F.col(col).alias(col.replace(' ','_')) for col in payload.columns])
     payload = column_to_keep
