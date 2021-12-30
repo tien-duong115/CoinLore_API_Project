@@ -39,7 +39,7 @@ def get_coin_request(start=0, limit=100):
     return payload
 
 
-def get_coin_market_request(HowMany=10, DataPath=''):
+def top_rank_coins(HowMany=10, DataPath='data/coins_data.csv'):
     """[
         - GET market of top coins
         - Return Pandas DataFrame
@@ -50,10 +50,11 @@ def get_coin_market_request(HowMany=10, DataPath=''):
     """
     payload=pd.read_csv(DataPath)
     finalPayload = pd.DataFrame()
-    
     df = payload.copy()
-    
     df['rank'] = df['rank'].astype(int)
+    df = df.set_index('id')
+    df.drop([45577,51539, 48829, 33435], inplace=True)
+    df.reset_index(inplace=True)
     sort_by_rank = df.sort_values(by='rank')
     top_coins = sort_by_rank.head(HowMany)
     list_of_top_coins = list(top_coins.id)
@@ -63,10 +64,9 @@ def get_coin_market_request(HowMany=10, DataPath=''):
         for line in r:
             finalPayload = finalPayload.append(line, ignore_index=True)
     finalPayload['time'] = pd.to_datetime(finalPayload['time'], unit='s')
-    
     return finalPayload
        
-        
+       
 def export_csv(payload,path):
     """[Used Pandas to export out as CSV format]
 
@@ -74,7 +74,7 @@ def export_csv(payload,path):
         payload ([dataframe]): [data to be export]
         path ([None]): [path to be export]
     """
-    payload.to_csv(path)
+    payload.to_csv(path, index=True)
     print(f'exported to {path}!')
 
 
@@ -85,7 +85,9 @@ def exchange_data_filter(data):
     """
     payload = pd.DataFrame.from_dict(data.values())
     payload = payload.astype({'id':int}).copy()
-    payload = df = payload[['id','name', 'name_id', 'url','country','date_live', 'date_added', 'usdt','fiat','auto','volume_usd','udate','volume_usd_adj']].sort_values(by=['id']).set_index('id').query("country != '' ")
+    payload = payload[['id','name', 'url','country','date_live', 'usdt','fiat','auto','volume_usd','udate','volume_usd_adj']].sort_values(by=['id']).set_index('id').query("country != '' ")
+    payload['country'].replace(r'[@#&$%+-/\n\r;*]','', regex=True, inplace=True)
+    payload.replace({'country':{r'U+K':'United Kingdom ', r'U+S' :'United State ', r'H+K': 'Hong Kong ', r'E+U': 'European Union '}}, regex=True, inplace=True)
     return payload
 
 

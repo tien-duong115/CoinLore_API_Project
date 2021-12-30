@@ -144,6 +144,13 @@ REGION 'us-west-2'
 ESCAPE
 """
 
+alter_exchange_table="""
+ALTER table exchange_data_table_stage
+ALTER COLUMN date_live TYPE DATE USING(date_live::date),
+ALTER COLUMN id TYPE integer using(id::integer),
+ALTER COLUMN volume_usd TYPE integer using(volume_usd::double precision),
+ALTER COLUMN volume_usd_adj TYPE integer using(volume_usd_adj::double precision)
+"""
 
 drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop, binance_stage_table_drop]
 

@@ -5,7 +5,10 @@ import time
 from pandas_functions import prettyRedshiftProps
 import config as c
 from contextlib import redirect_stdout
+import os
 
+exe_path = '/mnt/c/Users/tienl/Udacity_Courses/DE_capstone'
+os.chdir(exe_path)
 
 # (DWH_DB_USER, DWH_DB_PASSWORD, DWH_DB)
 print("\n\n")
@@ -112,16 +115,11 @@ while True:
     print('Cluster not up yet')
 
 
-with open('database/.env_db', 'w') as file:
+with open('database/.env', 'w') as file:
     with redirect_stdout(file):
         print(f'DWH_ENDPOINT={DWH_ENDPOINT}')
         print(f'DWH_ROLE_ARN={DWH_ROLE_ARN}')
-        print(f'S3_BUCKET_NAME={c.S3_BUCKET_NAME}')
-        print(f'DB_NAME={c.DWH_DB}')
-        print(f'DWB_DB_USER={c.DWH_DB_USER}')
-        print(f'DWB_DB_PASSWORD={c.DWH_DB_PASSWORD}')
-        print(f'DWH_PORT={c.DWH_PORT}')
-        print(f'COINS_DATA={c.COINS_DATA}')        
+     
 try:
     vpc = ec2.Vpc(id=myClusterProps['VpcId'])
     defaultSg = list(vpc.security_groups.all())[0]

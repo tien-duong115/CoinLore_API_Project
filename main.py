@@ -24,7 +24,7 @@ def main():
     
     # file paths
     coin_path = 'data/coins_data.csv'
-    coin_market_path = 'data/coin_market_info.csv'
+    coin_market_path = 'data/top_coins.csv'
     coin_exchange_path = 'data/coin_exchange_info.csv'
     binance_btc_file = 'data/binance_btc.csv' 
     
@@ -36,15 +36,16 @@ def main():
     print("Sucessfully get data and export out to {coin_exchange_path}!")
 
     # coins data pipeline 
-    coin_requests= get_coin_request(start=1, limit=7000)
+    coin_requests= get_coin_request(start=0, limit=7000)
     export_csv(coin_requests, coin_path)
     print("Sucessfully get data and export out to {coin_path}!")
 
 
     # coin's market data pipeline
-    coin_market_data = get_coin_market_request(HowMany=25, DataPath=coin_path)
-    export_csv(coin_market_data, coin_market_path)
-    print("Sucessfully get data and export out to {coin_market_path}!")
+    top_coins_path = 'data/top_coins.csv'
+    coin_market_data = top_rank_coins(HowMany=25)
+    export_csv(coin_market_data, top_coins_path)
+    print("Sucessfully get data and export out to: {top_coins_path}!")
 
     
     # Stage binance 1 minutes data to s3

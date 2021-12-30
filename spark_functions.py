@@ -5,7 +5,7 @@ import boto3
 import config as c
 
 
-def binance_BtcUSDT_minute(data):
+def binance_BtcUSDT_minute(data, column_to_keep):
     """[
         - Take data CSV format and manipulate the spark dataframe
         - Capitalize first letter of each column
@@ -14,6 +14,7 @@ def binance_BtcUSDT_minute(data):
 
     Args:
         data ([type]): [description]
+        columns_to_keep:   LIST of columns to keep
 
     Returns:
         [type]: [description]
@@ -21,12 +22,11 @@ def binance_BtcUSDT_minute(data):
     spark = c.spark()
     payload = spark.read.option('header', True).csv(data)
     payload = payload.select([F.col(col).alias(col.replace(' ','_')) for col in payload.columns])
+    payload = column_to_keep
     payload = payload.toDF(*[i.capitalize() for i in payload.columns])
     
-    collect_columns=['Open', 'High', 'Low','Close', 'Volume_btc', 'Tradecount', 'Volume_usdt']
-    
     for col1 in payload.columns:
-        for col2 in collect_columns:
+        for col2 in payload:
             if col1==col2:
                 payload = payload.withColumn(col1, round(col1, 1))
     payload = payload.withColumnRenamed('Open', 'Open_market')
