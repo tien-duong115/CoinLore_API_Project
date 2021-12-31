@@ -12,22 +12,22 @@ DWH_ROLE_ARN = os.getenv('DWH_ROLE_ARN')
 DWH_ENDPOINT = os.getenv('DWH_ENDPOINT')
 COINS_DATA=os.getenv('COINS_DATA')
 EXCHANGE_DATA=os.getenv('EXCHANGE_DATA')
-MARKET_DATA=os.getenv('MARKET_DATA')
-BINANCE_DATA=os.getenv('BINANCE_DATA')
+TOP_COINS=os.getenv('TOP_COINS')
+HISTORICAL_DATA=os.getenv('HISTORICAL_DATA')
 
 # print('\n\n')
 # print(DWH_ENDPOINT)
 # print(DWH_ROLE_ARN)
 # print(COINS_DATA)
 # print(EXCHANGE_DATA)
-# print(MARKET_DATA)
-# print(BINANCE_DATA)
+# print(top_coins)
+# print(HISTORICAL_DATA)
 # print('\n\n')
 
 coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
-market_stage_table_drop = 'DROP TABLE IF EXISTS market_data_table_stage'
+top_coins_stage_table_drop = 'DROP TABLE IF EXISTS top_coins_table_stage'
 exchange_stage_table_drop = 'DROP TABLE IF EXISTS exchange_data_table_stage'
-binance_stage_table_drop = 'DROP TABLE IF EXISTS binance_data_table_stage'
+historical_data_table_drop = 'DROP TABLE IF EXISTS historical_data_table_stage'
 
 
 coins_stage_table_create = ("""
@@ -36,18 +36,18 @@ CREATE TABLE IF NOT EXISTS coins_data_table_stage
         id INTEGER
         ,symbol VARCHAR
         ,name VARCHAR
-        ,rank FLOAT
-        ,price_usd FLOAT
-        ,percent_change_24h FLOAT
-        ,percent_change_1h FLOAT
-        ,percent_change_7d FLOAT
-        ,price_btc FLOAT
+        ,rank VARCHAR
+        ,price_usd VARCHAR
+        ,percent_change_24h VARCHAR
+        ,percent_change_1h VARCHAR
+        ,percent_change_7d VARCHAR
+        ,price_btc VARCHAR
         ,market_cap_usd VARCHAR
-        ,volume24 FLOAT
-        ,volume24a FLOAT
+        ,volume24 VARCHAR
+        ,volume24a VARCHAR
         ,csupply VARCHAR
-        ,tsupply FLOAT
-        ,msupply FLOAT
+        ,tsupply VARCHAR
+        ,msupply VARCHAR
     );
 """)
 
@@ -70,34 +70,34 @@ CREATE TABLE IF NOT EXISTS exchange_data_table_stage
 """)
 
 
-market_stage_table_create = ("""
-    CREATE TABLE IF NOT EXISTS market_data_table_stage
+top_coins_table_create = ("""
+    CREATE TABLE IF NOT EXISTS top_coins_table_stage
     (
         name VARCHAR 
         ,base VARCHAR
         ,quote VARCHAR
-        ,price FLOAT
-        ,price_usd FLOAT
-        ,volume FLOAT
-        ,volume_usd FLOAT
+        ,price VARCHAR
+        ,price_usd VARCHAR
+        ,volume VARCHAR
+        ,volume_usd VARCHAR
         ,time VARCHAR
     );
 """)
 
 
-binance_stage_table_create = ("""
-    CREATE TABLE IF NOT EXISTS binance_data_table_stage
+historical_data_table_create = ("""
+    CREATE TABLE IF NOT EXISTS historical_data_table_stage
     (
         Unix VARCHAR 
-        ,Date timestamp
+        ,Date VARCHAR
         ,Symbol VARCHAR
-        ,Open_market VARCHAR
-        ,High FLOAT
-        ,Low FLOAT
-        ,Close FLOAT
-        ,Volume_btc FLOAT
-        ,Volume_usdt FLOAT
-        ,Tradecount INTEGER
+        ,Open_price VARCHAR
+        ,High VARCHAR
+        ,Low VARCHAR
+        ,Close VARCHAR
+        ,Volume_bnb VARCHAR
+        ,Volume_usdt VARCHAR
+        ,Tradecount VARCHAR
     );
 """)
 
@@ -107,28 +107,36 @@ FROM '{COINS_DATA}'
 CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
 IGNOREHEADER 1
 COMPUPDATE OFF
+FILLRECORD
+EMPTYASNULL
+REMOVEQUOTES
 DELIMITER ','
 REGION 'us-west-2'
+ESCAPE
 """
 
-copy_market_data_to_redshift = f"""
-COPY market_data_table_stage
-FROM '{MARKET_DATA}'
+copy_top_coins_to_redshift = f"""
+COPY top_coins_table_stage
+FROM '{TOP_COINS}'
 CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
 IGNOREHEADER 1
 COMPUPDATE OFF
+REMOVEQUOTES
 DELIMITER ','
 REGION 'us-west-2'
+ESCAPE
 """
 
-copy_binance_data_to_redshift = f"""
-COPY binance_data_table_stage
-FROM '{BINANCE_DATA}'
+copy_historical_data_to_redshift = f"""
+COPY historical_data_table_stage
+FROM '{HISTORICAL_DATA}'
 CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
 IGNOREHEADER 1
 COMPUPDATE OFF
+REMOVEQUOTES
 DELIMITER ','
 REGION 'us-west-2'
+ESCAPE
 """
 
 copy_exchange_data_to_redshift = f"""
@@ -152,18 +160,18 @@ ALTER COLUMN volume_usd TYPE integer using(volume_usd::double precision),
 ALTER COLUMN volume_usd_adj TYPE integer using(volume_usd_adj::double precision)
 """
 
-drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, market_stage_table_drop, binance_stage_table_drop]
+drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_drop]
 
-create_table_queries = [coins_stage_table_create, exchange_stage_table_create, market_stage_table_create, binance_stage_table_create]
+create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_table_create, historical_data_table_create]
 
-copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_market_data_to_redshift, copy_binance_data_to_redshift]
+copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_top_coins_to_redshift, copy_historical_data_to_redshift]
 
 
 # print(f'\n\n{coins_stage_table_create}\n\n')
 
 # print(f'{exchange_stage_table_create}\n\n')
 
-# print(f'{market_stage_table_create}\n\n')
+# print(f'{top_coins_table_create}\n\n')
 
 
 # for i in drop_table_queries:

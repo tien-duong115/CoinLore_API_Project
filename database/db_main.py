@@ -30,6 +30,7 @@ def drop_tables(cur, conn):
     """
     for query in drop_table_queries:
         cur.execute(query)
+        print(f"\nSucessfully DROPPED {query}!\n")
         conn.commit()
 
 
@@ -39,6 +40,7 @@ def create_tables(cur, conn):
     """
     for query in create_table_queries:
         cur.execute(query)
+        print(f"\nSucessfully CREATED {query}!\n")
         conn.commit()
 
 
@@ -48,6 +50,7 @@ def load_staging_tables(cur, conn):
     """
     for query in copy_table_queries:
         cur.execute(query)
+        print(f"\nSucessfully COPY {query}!\n")
         conn.commit()
 
 

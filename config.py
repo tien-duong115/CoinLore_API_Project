@@ -51,12 +51,8 @@ redshift = boto3.client('redshift',
                        aws_access_key_id=KEY,
                        aws_secret_access_key=SECRET
                        )
-def spark():
-   spark = SparkSession.builder.\
-      config("spark.jars.repositories", "https://repos.spark-packages.org/").\
-      config("spark.jars.packages", "saurfang:spark-sas7bdat:2.0.0-s_2.11").\
-      enableHiveSupport().getOrCreate()
-   return spark
+
+
 
 session = boto3.Session(
    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),

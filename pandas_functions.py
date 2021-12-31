@@ -36,6 +36,7 @@ def get_coin_request(start=0, limit=100):
         for line in entry:
             payload = payload.append(line, ignore_index=True)
         print(f"Successfully request number {i}")
+    payload.drop(columns='nameid', inplace=True)
     return payload
 
 
