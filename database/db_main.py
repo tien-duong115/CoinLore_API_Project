@@ -3,8 +3,10 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-from create_table_sql import drop_table_queries, create_table_queries, copy_table_queries
+from create_table_sql import drop_table_queries, create_table_queries, copy_table_queries, insert_table_queries
 
+exe_path = '/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/database'
+os.chdir(exe_path)
 #Dynamic Environment variables
 load_dotenv()
 HOST = os.getenv('DWH_ENDPOINT')
@@ -30,7 +32,7 @@ def drop_tables(cur, conn):
     """
     for query in drop_table_queries:
         cur.execute(query)
-        print(f"\nSucessfully DROPPED {query}!\n")
+        print(f"\nSucessfully DROPPED \n{query}!\n")
         conn.commit()
 
 
@@ -40,7 +42,6 @@ def create_tables(cur, conn):
     """
     for query in create_table_queries:
         cur.execute(query)
-        print(f"\nSucessfully CREATED {query}!\n")
         conn.commit()
 
 
@@ -50,7 +51,14 @@ def load_staging_tables(cur, conn):
     """
     for query in copy_table_queries:
         cur.execute(query)
-        print(f"\nSucessfully COPY {query}!\n")
+        conn.commit()
+        
+def insert_tables(cur, conn):
+    """
+    This function insert data into the tables in the DW
+    """
+    for query in insert_table_queries:
+        cur.execute(query)
         conn.commit()
 
 
@@ -58,27 +66,32 @@ def main():
     """
     Using another files with all connection string to connect into DW cluster
     """
+
+    conn = psycopg2.connect(f"host={HOST} dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} port={DB_PORT}")
+    # conn = psycopg2.connect(host=f'{localhost}',database=f'{local_dbname}',user=f'{local_username}',password=f'{local_password}')
+    cur = conn.cursor()
     try:
-        
-        conn = psycopg2.connect(f"host={HOST} dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} port={DB_PORT}")
-        # conn = psycopg2.connect(f"host={localhost},database={local_dbname},user={local_username},password={local_password}")
-        
-        cur = conn.cursor()
-        
         drop_tables(cur, conn)
-        print("\n\nSucessfully DROP tables!")
-        
+    except Exception as e:
+        print(f'\n{e}')
+    try:      
         create_tables(cur, conn)
-        print("\n\nSucessfully CREATE new tables!\n")
-        
+    except Exception as e:
+        print(f'\n{e}')
+    try:        
         load_staging_tables(cur,conn)
         print("\n\nSucessfully COPY new tables!\n")
-        conn.close()
-        
     except Exception as e:
-        if e == e:
-            print('Fail to create or drop tables!')
-            print(f'\n{e}')
+        print(e)
+    try:
+        insert_tables(cur,conn)
+        print("Sucessfully inserted!")
+    except Exception as e:
+        print(f"\n{e}")
+
+            
+    conn.close()
+    
 
 if __name__ == "__main__":
     main()
