@@ -67,6 +67,9 @@ def top_rank_coins(HowMany=10, DataPath='data/coins_data.csv'):
         for line in r:
             finalPayload = finalPayload.append(line, ignore_index=True)
     finalPayload['time'] = pd.to_datetime(finalPayload['time'], unit='s')
+    finalPayload['name'].replace(r'[@#&$%+-/\n\r;*]','', regex=True, inplace=True)
+    finalPayload.reset_index(inplace=True)
+    finalPayload.rename(columns={'index':'id'}, inplace=True)
     return finalPayload
        
        
@@ -77,7 +80,8 @@ def export_csv(payload,path):
         payload ([dataframe]): [data to be export]
         path ([None]): [path to be export]
     """
-    payload.to_csv(path, index=True)
+    
+    payload.to_csv(path, index=0)
     print(f'exported to {path}!')
 
 
@@ -91,6 +95,7 @@ def exchange_data_filter(data):
     payload = payload[['id','name', 'url','country','date_live', 'usdt','fiat','auto','volume_usd','udate','volume_usd_adj']].sort_values(by=['id']).set_index('id').query("country != '' ")
     payload['country'].replace(r'[@#&$%+-/\n\r;*]','', regex=True, inplace=True)
     payload.replace({'country':{r'U+K':'United Kingdom ', r'U+S' :'United State ', r'H+K': 'Hong Kong ', r'E+U': 'European Union '}}, regex=True, inplace=True)
+    payload.reset_index(inplace=True)
     return payload
 
 

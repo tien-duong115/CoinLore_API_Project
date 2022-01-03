@@ -15,15 +15,6 @@ EXCHANGE_DATA=os.getenv('EXCHANGE_DATA')
 TOP_COINS=os.getenv('TOP_COINS')
 HISTORICAL_DATA=os.getenv('HISTORICAL_DATA')
 
-# print('\n\n')
-# print(DWH_ENDPOINT)
-# print(DWH_ROLE_ARN)
-# print(COINS_DATA)
-# print(EXCHANGE_DATA)
-# print(top_coins)
-# print(HISTORICAL_DATA)
-# print('\n\n')
-
 coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
 top_coins_stage_table_drop = 'DROP TABLE IF EXISTS top_coins_table_stage'
 exchange_stage_table_drop = 'DROP TABLE IF EXISTS exchange_data_table_stage'
@@ -31,6 +22,8 @@ historical_data_table_stage_drop = 'DROP TABLE IF EXISTS historical_data_table_s
 
 drop_exchange_table = """DROP TABLE IF EXISTS exchange_data_table"""
 drop_coins_table =  """DROP TABLE IF EXISTS coins_data_table"""
+drop_historical_table =""" DROP TABLE IF EXISTS historical_data_table"""
+drop_top_coins_table = """ DROP TABLE IF EXISTS top_coins_data_table"""
 
 coins_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS coins_data_table_stage
@@ -72,13 +65,13 @@ CREATE TABLE IF NOT EXISTS exchange_data_table_stage
 """)
 
 
-top_coins_table_create = ("""
+top_coins_stage_table_create = ("""
     CREATE TABLE IF NOT EXISTS top_coins_table_stage
-    (
-        name VARCHAR 
+    (   id  integer 
+        ,name VARCHAR
         ,base VARCHAR
         ,quote VARCHAR
-        ,price VARCHAR
+        ,price varchar
         ,price_usd VARCHAR
         ,volume VARCHAR
         ,volume_usd VARCHAR
@@ -123,6 +116,8 @@ FROM '{TOP_COINS}'
 CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
 IGNOREHEADER 1
 COMPUPDATE OFF
+FILLRECORD
+EMPTYASNULL
 REMOVEQUOTES
 DELIMITER ','
 REGION 'us-west-2'
@@ -142,7 +137,7 @@ ESCAPE
 """
 
 copy_exchange_data_to_redshift = f"""
-COPY exchange_data_table_stage(id, name, url, country, date_live, usdt, fiat,auto, volume_usd, udate, volume_usd_adj)
+COPY exchange_data_table_stage
 FROM '{EXCHANGE_DATA}'
 CREDENTIALS 'aws_iam_role={DWH_ROLE_ARN}'
 IGNOREHEADER 1
@@ -200,45 +195,55 @@ SELECT  id::numeric
 FROM exchange_data_table_stage;"""
 
 
+create_coins_table = """CREATE TABLE IF NOT EXISTS coins_data_table( id integer primary key sortkey distkey, symbol varchar, name varchar, rank float, market_cap_usd float, price_usd float, price_btc float);"""
 
-create_coins_table = """CREATE TABLE IF NOT EXISTS coins_data_table( id integer primary key sortkey distkey, name varchar, symbol varchar, rank float, market_cap_usd float, price_usd float);"""
-
-insert_coins_table = """INSERT INTO coins_data_table( name, id, rank , market_cap_usd, price_usd)
-SELECT  name
-       ,symbol::integer as id
-       ,price_usd::float          AS rank
-       ,replace(volume24,'0?', '0.0')::float  AS market_cap_usd
-       ,percent_change_24h::float as price_usd
-
+insert_coins_table = """INSERT INTO coins_data_table(id, symbol, name, rank , market_cap_usd, price_usd, price_btc)
+SELECT  id::integer
+       ,symbol
+       ,name
+       ,rank::float
+       ,replace(market_cap_usd,'0?', '0.0')::float
+       ,price_usd::float
+       ,price_btc::float
 FROM coins_data_table_stage;"""
 
 
-# drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_stage_drop]
-drop_table_queries = [ exchange_stage_table_drop, drop_exchange_table]
+create_historical_table = """ CREATE TABLE IF NOT EXISTS historical_data_table(unix varchar, date date distkey sortkey, symbol varchar, open_price float, high float, low float, close float, volume_bnb float, volume_usdt float, tradecount integer)
+"""
 
+insert_historical_table = """ INSERT INTO historical_data_table(unix, date, symbol, open_price, high, low, close, volume_bnb, volume_usdt, tradecount)
+SELECT  unix::varchar
+       ,date::date 
+       ,split_part(symbol,'/',1) AS symbol
+       ,open_price::float
+       ,high::float
+       ,low::float
+       ,close::float
+       ,volume_bnb::float
+       ,volume_usdt::float
+       ,tradecount::integer
+FROM historical_data_table_stage
+"""
 
-# create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_table_create, historical_data_table_create]
+create_top_coins_table = """CREATE TABLE IF NOT EXISTS top_coins_data_table( id integer primary key distkey sortkey, name varchar, base varchar, quote varchar, price float, price_usd float, volume float, volume_usd float, time date)
+"""
 
-create_table_queries = [exchange_stage_table_create, create_exchange_table]
+insert_top_coins_table = """ INSERT INTO top_coins_data_table( id, name, base, quote, price, price_usd, volume, volume_usd, time)
+SELECT  id::integer
+       ,name
+       ,base
+       ,quote
+       ,price::float
+       ,price_usd::float
+       ,volume::float
+       ,volume_usd::float
+       ,time::date
+FROM top_coins_table_stage
+"""
 
-
-# copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_top_coins_to_redshift, copy_historical_data_to_redshift]
-
-
-copy_table_queries=[copy_exchange_data_to_redshift]
-
-insert_table_queries= [insert_exchange_table]
-
-# print(f'\n\n{coins_stage_table_create}\n\n')
-
-# print(f'{exchange_stage_table_create}\n\n')
-
-# print(f'{top_coins_table_create}\n\n')
-
-
-# for i in drop_table_queries:
-#     print(i)
-# for e in copy_table_queries:    
-#     print(e)
+drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_stage_drop, drop_exchange_table, drop_coins_table, drop_historical_table, drop_top_coins_table]
+create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_stage_table_create, historical_data_table_create, create_coins_table, create_exchange_table, create_historical_table, create_top_coins_table]
+copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_top_coins_to_redshift, copy_historical_data_to_redshift]
+insert_table_queries= [insert_top_coins_table, insert_coins_table, insert_historical_table, insert_exchange_table ]
 
 

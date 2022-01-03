@@ -58,6 +58,7 @@ def insert_tables(cur, conn):
     This function insert data into the tables in the DW
     """
     for query in insert_table_queries:
+        print(f'TRYING INSERT AT: \n{query}')
         cur.execute(query)
         conn.commit()
 
@@ -73,21 +74,21 @@ def main():
     try:
         drop_tables(cur, conn)
     except Exception as e:
-        print(f'\n{e}')
+        print(f'1: \n{e}')
     try:      
         create_tables(cur, conn)
     except Exception as e:
-        print(f'\n{e}')
+        print(f'2: \n{e}')
     try:        
         load_staging_tables(cur,conn)
         print("\n\nSucessfully COPY new tables!\n")
     except Exception as e:
-        print(e)
+        print(f'3: \n{e}')
     try:
         insert_tables(cur,conn)
         print("Sucessfully inserted!")
     except Exception as e:
-        print(f"\n{e}")
+        print(f'4: \n{e}')
 
             
     conn.close()

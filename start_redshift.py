@@ -61,7 +61,6 @@ try:
 except Exception as e:
     print(e)
     
-    
 print("1.2 Attaching Policy")
 
 iam.attach_role_policy(RoleName=c.DWH_IAM_ROLE_NAME,
