@@ -38,19 +38,17 @@ def binance_coins_data(data, output):
 def upload_to_s3(bucketname, local_file_path, s3_file_path):
 
     try:
-        s3 = boto3.resource('s3')
-        s3.meta.client.upload_file(local_file_path, bucketname, s3_file_path)
+        c.s3.meta.client.upload_file(local_file_path, bucketname, s3_file_path)
         print('Success!')
     except Exception as e:
-        print(f'{e}\n Fail!')
+        print(f'{e}\n Fail to exported to S3!\n')
         
 
 def download_from_s3(s3_bucket, s3_file_path, local_file_path):
 
     try:
-        s3 = boto3.resource('s3')
-        my_bucket = s3.Bucket(s3_bucket)
+        my_bucket = c.s3.Bucket(s3_bucket)
         my_bucket.download_file(s3_file_path, local_file_path)
         print('Success!')
     except Exception as e:
-        print(f'{e}\n Fail!')
+        print(f'{e}\n Fail to download from S3!')

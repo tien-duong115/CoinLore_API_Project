@@ -307,6 +307,7 @@ top_coins_stage_table_drop = 'DROP TABLE IF EXISTS top_coins_table_stage'
 exchange_stage_table_drop = 'DROP TABLE IF EXISTS exchange_data_table_stage'
 historical_data_table_stage_drop = 'DROP TABLE IF EXISTS historical_data_table_stage'
 
+# validation_queries = [validation_coins_stage_table, validation_exchange_stage_table, validation_top_coins_table_stage, validation_historical_table_stage, redshift_Validation_query]
 validation_queries = [validation_coins_stage_table, validation_exchange_stage_table, validation_top_coins_table_stage, validation_historical_table_stage, redshift_Validation_query]
 
 

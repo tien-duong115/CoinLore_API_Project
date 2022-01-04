@@ -2,7 +2,7 @@
 ## **.README**
 ### **Project Overview**
 <br>
-<p> As part of Data-Engineer Udacity-CapStone project to apply concept learn within the course such as AWS services, relational database systems, and scheduling services. With the current popularity crypto-currencie. To help user keeping up to date of new coins being created and different exchanges services. I created an data pipeline from coinlore api service and hosted it on AWS services including dataware house storage system.Coinlore is an open public API that let user request for cryptocurrencies and exchanges information. This project current lack many feature in supporting real-time situation data. Intergrating features such as data migration tools to keeping track of different versions and migration control. Furthermore, the project can also leverages of scheduling services to refresh the database with the new data inserted. If the current project requires larger space and higher compute power, we can use HDFS on top of Redshift cluster and process the data with spark.
+<p> As part of Data-Engineer Udacity-CapStone project to apply concept learn within the course such as AWS services, relational database systems, and scheduling services. With the current popularity crypto-currencie. To help user keeping up to date of new coins being created and different exchanges services. I created an data pipeline from coinlore api service and hosted it on AWS services including dataware house storage system.Coinlore is an open public API that let user request for cryptocurrencies and exchanges information. This project current lack many feature in supporting real-time situation data. Intergrating features such as data migration tools to keeping track of different versions and migration control. Furthermore, the project can also leverages of scheduling services to refresh the database with the new data inserted. If the current project requires larger space and higher compute power, we can use HDFS on top of Redshift cluster and process the data with spark. Data validation with unittest to check if all data inserted into redshift appropriately.
 </p>
 
 <h1><center>Data Model</center></h1>
@@ -38,7 +38,11 @@ This model have multiple dimensional tables and one fact table to help analytic 
    6. run db_main.py
 
             Use Output from start_redshift.py to connect into Redshift cluster 
-   7. run stop_redshift.py (close cluster)
+   7. run Database_Validation_Script.py
+            
+            Validate if table shape within S3 bucket files before staging to redshift VS. after staging to Redshift. All rows and column numbers should match to PASS all test cases.
+   
+   8. run stop_redshift.py (close cluster)
 
 ## **Pipeline Steps**
 - Build ETL pipeline from coinlore open API of cryptopcurrencies
@@ -59,7 +63,8 @@ This model have multiple dimensional tables and one fact table to help analytic 
             Pyspark: Manipulate data and handle large data set execution tasks.
             dotenv: Environment variable load into script to prevent exposure of sensitive credential access keys.
             boto3: AWS python CLI interface to execute tasks such as start and stop redshift cluster and transfering data into S3 bucket.
-            requests: request data from coinlore API page 
+            requests: request data from coinlore API page
+            unittest: Unit test cases for database validation after transport into redshift
 
 - *Power bi*
 <br> Create visualization and data modeling 
@@ -116,8 +121,10 @@ This model have multiple dimensional tables and one fact table to help analytic 
  3. stop_redshift.py ==> Stop Redshift Cluster script, will check until cluster CLOSE
 
  4. database DIR --
+        
         -- create_table_sql.py  ==> contain SQL queries to DROP, CREATE, INSERT data into S3 and Redshift
         -- db_main.py ==> pipeline script to run SQL queries
+        -- Database_Validation_Script.py ==> Test case script check if data inserted from S3 matched against after into Redshift.
 
  5. main.py ==> Pipeline for data cleaning, and export into S3
 
@@ -130,7 +137,6 @@ This model have multiple dimensional tables and one fact table to help analytic 
  9. pandas_functions.py ==> Function in pandas to import, transform and export data
 
  10. data_schema.pbix    ==> visualization of datasets along with table schema
-
 
  References:
  
