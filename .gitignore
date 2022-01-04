@@ -8,3 +8,4 @@ notebook.ipynb
 database/__pycache__
 database/.env
 notebook_psql_redshift.ipynb
+demo.py

@@ -3,10 +3,13 @@ from requests.api import get
 from pandas_functions import *
 from  spark_functions import *
 import pandas as pd
-import os
 from dotenv import load_dotenv
 import config as c
 import glob
+from contextlib import redirect_stdout
+
+
+
 
 def main():
     """[
@@ -45,8 +48,8 @@ def main():
     #top coins data pipeline
     try:
         top_coins_path = 'data/top_coins.csv'
-        coin_market_data = top_rank_coins(HowMany=25)
-        export_csv(coin_market_data, top_coins_path)
+        top_coins = top_rank_coins(HowMany=25)
+        export_csv(top_coins, top_coins_path)
         print("\nSucessfully get data and export out to: {top_coins_path}!\n\n")
     except Exception as e:
         print('\nFail to GET at {top_coins_path}\n')
@@ -100,6 +103,14 @@ def main():
     except Exception as e:
         print(f'\nFail to upload {coin_exchange_path}\n')
         print(e)
+        
 
+    with open('data_result_output.py', 'w') as f:
+        with redirect_stdout(f):
+            print(f"exchange_data_s3_result={exchange_data.shape}")
+            print(f"coin_requests_s3_result={coin_requests.shape}")
+            print(f"top_coins_s3_result={top_coins.shape}")
+            print(f"historical_s3_result={frame.shape}")
+            
 if __name__ == "__main__":
     main()

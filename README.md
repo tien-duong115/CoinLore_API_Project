@@ -7,15 +7,21 @@
 
 <h1><center>Data Model</center></h1>
 
-                                    Star Schema:
+                                    Star Schema: Simple and best for readbility and implementation of future changes.
       This model have multiple dimensional tables and one fact table to help analytic team determine the cryptocurrencie's data, along with historical data in minute. This data best update once per day because it will capture 1 minutes data of market for each cryptocurrencies within the fact table.
 
 ![data_model](data/data_model.jpg)
 
 
 <h1><center>Data Example</center></h1>
+<br>
 
 ![data_model](data/data_example.jpg)
+
+<br>
+<h1><center>Data Definition</center></h1>
+
+![data_model](data/data_dict.jpg)
 
 ## **How To Use:**
 
@@ -122,5 +128,7 @@
 
 
  References:
- `https://www.cryptodatadownload.com/`
- 'https://www.coinlore.com/cryptocurrency-data-api'
+ 
+      https://www.cryptodatadownload.com/
+ 
+      https://www.coinlore.com/cryptocurrency-data-api

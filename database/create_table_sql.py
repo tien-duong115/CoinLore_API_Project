@@ -241,6 +241,15 @@ SELECT  id::integer
 FROM top_coins_table_stage
 """
 
+
+
+
+# coin_validation = """
+# select 
+# """
+
+
+
 drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_stage_drop, drop_exchange_table, drop_coins_table, drop_historical_table, drop_top_coins_table]
 create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_stage_table_create, historical_data_table_create, create_coins_table, create_exchange_table, create_historical_table, create_top_coins_table]
 copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_top_coins_to_redshift, copy_historical_data_to_redshift]
