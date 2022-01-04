@@ -1,14 +1,14 @@
                                 # coinlore_api_project
 ## **.README**
 ### **Project Overview**
-
-      As part of Data-Engineer Udacity-CapStone project to apply concept learn within the course such as AWS services, relational database systems, and scheduling services. With the current popularity crypto-currencie. To help user keeping up to date of new coins being created and different exchanges services. I created an data pipeline from coinlore api service and hosted it on AWS services including dataware house storage system.Coinlore is an open public API that let user request for cryptocurrencies and exchanges information. This project current lack many feature in supporting real-time situation data. Intergrating features such as data migration tools to keeping track of different versions and migration control. Furthermore, the project can also leverages of scheduling services to refresh the database with the new data inserted. If the current project requires larger space and higher compute power, we can use HDFS on top of Redshift cluster and process the data with spark.
-
+<br>
+<p> As part of Data-Engineer Udacity-CapStone project to apply concept learn within the course such as AWS services, relational database systems, and scheduling services. With the current popularity crypto-currencie. To help user keeping up to date of new coins being created and different exchanges services. I created an data pipeline from coinlore api service and hosted it on AWS services including dataware house storage system.Coinlore is an open public API that let user request for cryptocurrencies and exchanges information. This project current lack many feature in supporting real-time situation data. Intergrating features such as data migration tools to keeping track of different versions and migration control. Furthermore, the project can also leverages of scheduling services to refresh the database with the new data inserted. If the current project requires larger space and higher compute power, we can use HDFS on top of Redshift cluster and process the data with spark.
+</p>
 
 <h1><center>Data Model</center></h1>
 
-                                    Star Schema: Simple and best for readbility and implementation of future changes.
-      This model have multiple dimensional tables and one fact table to help analytic team determine the cryptocurrencie's data, along with historical data in minute. This data best update once per day because it will capture 1 minutes data of market for each cryptocurrencies within the fact table.
+<p> Star Schema: Simple and best for readbility and implementation of future changes.
+This model have multiple dimensional tables and one fact table to help analytic team determine the cryptocurrencie's data, along with historical data in minute. This data best update once per day because it will capture 1 minutes data of market for each cryptocurrencies within the fact table.</p>
 
 ![data_model](data_model.jpg)
 
