@@ -74,13 +74,18 @@ This model have multiple dimensional tables and one fact table to help analytic 
 
 ## **Data Information**
 
+## 3 data types: 
+      1. JSON format from request
+      2. CSV format
+      3. Parquet from Pyspark Output
+
 **Coins data: s3://tien-duong1151/data/coins_data.csv**
 - Retreived from coinlore API, consisted of coin symbols, full name, rank, market cap and price in USD
 
 **Exchange data: s3://tien-duong1151/data/coin_exchange_info.csv**
 - Retreived from coinlore API, information on exchanges of cryptocurrencies broker. Consisted of exchange full name, URL, country exchange base at, and date exchange went live
 
-**Top coins: s3://ten-duong1151/data/top_coins.csv**
+**Top coins: s3://tien-duong1151/data/top_coins.csv**
 - Retreived from coinlore API, use rank base on `exchange data` and request as user's desire number of top coins to be returned. Consisted of coin full name, ability to trade with, price, and volume
 
 **Historical data: s3://tien-duong1151/data/final_historical_data.csv**
