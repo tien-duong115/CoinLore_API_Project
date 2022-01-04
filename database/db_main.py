@@ -67,8 +67,10 @@ def main():
     """
     Using another files with all connection string to connect into DW cluster
     """
-
+    ### Redshift database connection
     conn = psycopg2.connect(f"host={HOST} dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} port={DB_PORT}")
+    
+    ### Local postgres database connection
     # conn = psycopg2.connect(host=f'{localhost}',database=f'{local_dbname}',user=f'{local_username}',password=f'{local_password}')
     cur = conn.cursor()
     try:
@@ -90,7 +92,7 @@ def main():
     except Exception as e:
         print(f'4: \n{e}')
 
-            
+    
     conn.close()
     
 

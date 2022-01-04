@@ -1,4 +1,4 @@
-#/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/capstone_venv/bin/python3.8
+# /mnt/c/Users/tienl/Udacity_Courses/DE_capstone/capstone_venv/bin/python3.8
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -10,10 +10,10 @@ load_dotenv(my_path)
 BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 DWH_ROLE_ARN = os.getenv('DWH_ROLE_ARN')
 DWH_ENDPOINT = os.getenv('DWH_ENDPOINT')
-COINS_DATA=os.getenv('COINS_DATA')
-EXCHANGE_DATA=os.getenv('EXCHANGE_DATA')
-TOP_COINS=os.getenv('TOP_COINS')
-HISTORICAL_DATA=os.getenv('HISTORICAL_DATA')
+COINS_DATA = os.getenv('COINS_DATA')
+EXCHANGE_DATA = os.getenv('EXCHANGE_DATA')
+TOP_COINS = os.getenv('TOP_COINS')
+HISTORICAL_DATA = os.getenv('HISTORICAL_DATA')
 
 coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
 top_coins_stage_table_drop = 'DROP TABLE IF EXISTS top_coins_table_stage'
@@ -21,9 +21,11 @@ exchange_stage_table_drop = 'DROP TABLE IF EXISTS exchange_data_table_stage'
 historical_data_table_stage_drop = 'DROP TABLE IF EXISTS historical_data_table_stage'
 
 drop_exchange_table = """DROP TABLE IF EXISTS exchange_data_table"""
-drop_coins_table =  """DROP TABLE IF EXISTS coins_data_table"""
-drop_historical_table =""" DROP TABLE IF EXISTS historical_data_table"""
+drop_coins_table = """DROP TABLE IF EXISTS coins_data_table"""
+drop_historical_table = """ DROP TABLE IF EXISTS historical_data_table"""
 drop_top_coins_table = """ DROP TABLE IF EXISTS top_coins_data_table"""
+drop_bridge_table = """ DROP TABLE IF EXISTS bridge_table"""
+
 
 coins_stage_table_create = ("""
 CREATE TABLE IF NOT EXISTS coins_data_table_stage
@@ -149,6 +151,10 @@ REGION 'us-west-2'
 ESCAPE
 """
 
+"""
+>>> POSTGRRES SQL LOCAL DATABASE QUERY
+- Uncommented to test within local
+"""
 # copy_coins_data_to_redshift = f"""
 # COPY coins_data_table_stage
 # FROM '/mnt/c/Users/tienl/Udacity_Courses/DE_capstone/data/coins_data.csv'
@@ -179,7 +185,6 @@ ESCAPE
 # DELIMITER ','
 # CSV ;
 # """
-
 
 
 create_exchange_table = """CREATE TABLE if not exists exchange_data_table(id integer primary key sortkey distkey, name varchar, url varchar, country varchar, date_live date, volume_usd numeric, volume_usd_adj numeric);"""
@@ -242,17 +247,74 @@ FROM top_coins_table_stage
 """
 
 
+create_bridge_table = """
+CREATE TABLE if not exists bridge_table(coin_names varchar primary key sortkey distkey)"""
+
+insert_bridge_table = """
+INSERT INTO bridge_table(coin_names)
+SELECT  distinct symbol
+FROM historical_data_table"""
+
+### Use this for Redshift database
+redshift_Validation_query = """
+SELECT  t.name
+       ,t.base AS coin_symbol
+       ,t.price
+       ,t.price_usd
+       ,e.url
+       ,e.country
+       ,e.date_live
+       ,t.volume
+FROM top_coins_data_table AS t
+JOIN exchange_data_table_stage AS e
+ON t.name = e.name
+"""
+
+### Use this if working with local database
+local_Validation_query = """
+SELECT  t.name
+       ,t.base AS coin_symbol
+       ,t.price
+       ,t.price_usd
+       ,e.url
+       ,e.country
+       ,e.date_live
+       ,t.volume
+FROM top_coins_table_stage AS t
+JOIN exchange_data_table_stage AS e
+ON t.name = e.name
+"""
+
+validation_coins_stage_table = """
+select * from coins_data_table_stage
+"""
+
+validation_exchange_stage_table = """
+select * from exchange_data_table_stage
+"""
+
+validation_historical_table_stage = """
+select * from historical_data_table_stage
+"""
+
+validation_top_coins_table_stage = """
+select * from top_coins_table_stage
+"""
 
 
-# coin_validation = """
-# select 
-# """
+coins_stage_table_drop = 'DROP TABLE IF EXISTS coins_data_table_stage'
+top_coins_stage_table_drop = 'DROP TABLE IF EXISTS top_coins_table_stage'
+exchange_stage_table_drop = 'DROP TABLE IF EXISTS exchange_data_table_stage'
+historical_data_table_stage_drop = 'DROP TABLE IF EXISTS historical_data_table_stage'
+
+validation_queries = [validation_coins_stage_table, validation_exchange_stage_table, validation_top_coins_table_stage, validation_historical_table_stage, redshift_Validation_query]
 
 
-
-drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_stage_drop, drop_exchange_table, drop_coins_table, drop_historical_table, drop_top_coins_table]
-create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_stage_table_create, historical_data_table_create, create_coins_table, create_exchange_table, create_historical_table, create_top_coins_table]
-copy_table_queries=[copy_coins_data_to_redshift, copy_exchange_data_to_redshift, copy_top_coins_to_redshift, copy_historical_data_to_redshift]
-insert_table_queries= [insert_top_coins_table, insert_coins_table, insert_historical_table, insert_exchange_table ]
-
-
+drop_table_queries = [coins_stage_table_drop, exchange_stage_table_drop, top_coins_stage_table_drop, historical_data_table_stage_drop,
+                      drop_exchange_table, drop_coins_table, drop_historical_table, drop_top_coins_table, drop_bridge_table]
+create_table_queries = [coins_stage_table_create, exchange_stage_table_create, top_coins_stage_table_create, historical_data_table_create,
+                        create_coins_table, create_exchange_table, create_historical_table, create_top_coins_table, create_bridge_table]
+copy_table_queries = [copy_coins_data_to_redshift, copy_exchange_data_to_redshift,
+                      copy_top_coins_to_redshift, copy_historical_data_to_redshift]
+insert_table_queries = [insert_top_coins_table, insert_coins_table,
+                        insert_historical_table, insert_exchange_table, insert_bridge_table]

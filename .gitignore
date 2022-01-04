@@ -9,3 +9,5 @@ database/__pycache__
 database/.env
 notebook_psql_redshift.ipynb
 demo.py
+database/notebook_2.ipynb
+Book1.xlsx
