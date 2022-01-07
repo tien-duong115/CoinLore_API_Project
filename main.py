@@ -1,116 +1,131 @@
 
+
+import os
+import sys
+sys.path.insert(0, '/mnt/c/Users/tienl/airflow/coinlore_api_project')
 from requests.api import get
 from pandas_functions import *
-from  spark_functions import *
+from spark_functions import *
 import pandas as pd
 from dotenv import load_dotenv
 import config as c
 import glob
 from contextlib import redirect_stdout
 
+# coin_path = 'data/coins_data.csv'
+# top_coins_path = 'data/top_coins.csv'
+# coin_exchange_path = 'data/coin_exchange_info.csv'
+# historical_data = 'data/historical_data.csv'
+# historical_data_path = "data/Downloaded_data/*.csv"
+# final_historical = "data/final_historical_data.csv"
 
+def get_coins():
+#         # GET_all_exchanges = 'https://api.coinlore.net/api/exchanges/'
+#         # exchange_requests = get_request(GET_all_exchanges)
+#         # exchange_data = exchange_data_filter(exchange_requests)
+#         # export_csv(exchange_data,coin_exchange_path)
+        print('from my main file!')
 
-
-def main():
-    """[
-        - Data pipelines to extract, tranform and load data into S3 bucket
-        ]
-    """
+# def main():
+#     """[
+#         - Data pipelines to extract, tranform and load data into S3 bucket
+#         ]
+#     """
     
-    load_dotenv()
-    # file paths
-    coin_path = 'data/coins_data.csv'
-    top_coins_path = 'data/top_coins.csv'
-    coin_exchange_path = 'data/coin_exchange_info.csv'
-    historical_data = 'data/historical_data.csv'
-    historical_data_path = "data/Downloaded_data/*.csv"
-    final_historical = "data/final_historical_data.csv"
-    # Exchange data pipeline
-    try:
-        GET_all_exchanges = 'https://api.coinlore.net/api/exchanges/'
-        exchange_requests = get_request(GET_all_exchanges)
-        exchange_data = exchange_data_filter(exchange_requests)
-        export_csv(exchange_data,coin_exchange_path)
-        print(f"\n\nSucessfully get data and export out to {coin_exchange_path}!\n\n")
-    except Exception as e:
-        print(f'\nFail to GET at {GET_all_exchanges}\n')
-        print(e)
+#     load_dotenv()
+#     # file paths
+#     # coin_path = 'data/coins_data.csv'
+#     # top_coins_path = 'data/top_coins.csv'
+#     # coin_exchange_path = 'data/coin_exchange_info.csv'
+#     # historical_data = 'data/historical_data.csv'
+#     # historical_data_path = "data/Downloaded_data/*.csv"
+#     # final_historical = "data/final_historical_data.csv"
+#     # Exchange data pipeline
+#     try:
+#         GET_all_exchanges = 'https://api.coinlore.net/api/exchanges/'
+#         exchange_requests = get_request(GET_all_exchanges)
+#         exchange_data = exchange_data_filter(exchange_requests)
+#         export_csv(exchange_data,coin_exchange_path)
+#         print(f"\n\nSucessfully get data and export out to {coin_exchange_path}!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to GET at {GET_all_exchanges}\n')
+#         print(e)
         
-    # coins data pipeline 
-    try:
-        coin_requests= get_coin_request(start=0, limit=7000)
-        export_csv(coin_requests, coin_path)
-        print(f"\n\nSucessfully get data and export out to {coin_path}!\n\n")
-    except Exception as e:
-        print(f'\nFail to GET at {coin_path}\n')
-        print(e)
+#     # coins data pipeline 
+#     try:
+#         coin_requests= get_coin_request(start=0, limit=7000)
+#         export_csv(coin_requests, coin_path)
+#         print(f"\n\nSucessfully get data and export out to {coin_path}!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to GET at {coin_path}\n')
+#         print(e)
 
-    #top coins data pipeline
-    try:
-        top_coins_path = 'data/top_coins.csv'
-        top_coins = top_rank_coins(HowMany=25)
-        export_csv(top_coins, top_coins_path)
-        print(f"\nSucessfully get data and export out to: {top_coins_path}!\n\n")
-    except Exception as e:
-        print(f'\nFail to GET at {top_coins_path} \n')
-        print(e)
+#     #top coins data pipeline
+#     try:
+#         top_coins_path = 'data/top_coins.csv'
+#         top_coins = top_rank_coins(HowMany=25)
+#         export_csv(top_coins, top_coins_path)
+#         print(f"\nSucessfully get data and export out to: {top_coins_path}!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to GET at {top_coins_path} \n')
+#         print(e)
 
-    # binance historical coins data clean and export to csv
-    try:
-        path = r'data/historical_data.csv'
-        binance_coins_data(historical_data_path, historical_data)
-        all_files = glob.glob(path + "/*.csv")
-        li = []
-        for filename in all_files:
-            df = pd.read_csv(filename, index_col=None, header=0)
-            li.append(df)
-        frame = pd.concat(li, axis=0, ignore_index=True)
-        frame.to_csv('data/final_historical_data.csv', index=False)
-        print(f"\nSucessfully clean and export historical data to {historical_data}\n")
-    except Exception as e:
-        print(f'\nFail to clean and export {historical_data_path}\n')
-        print(e) 
+#     # binance historical coins data clean and export to csv
+#     try:
+#         path = r'data/historical_data.csv'
+#         binance_coins_data(historical_data_path, historical_data)
+#         all_files = glob.glob(path + "/*.csv")
+#         li = []
+#         for filename in all_files:
+#             df = pd.read_csv(filename, index_col=None, header=0)
+#             li.append(df)
+#         frame = pd.concat(li, axis=0, ignore_index=True)
+#         frame.to_csv('data/final_historical_data.csv', index=False)
+#         print(f"\nSucessfully clean and export historical data to {historical_data}\n")
+#     except Exception as e:
+#         print(f'\nFail to clean and export {historical_data_path}\n')
+#         print(e) 
     
-    # Stage historical 1 minutes data to s3
-    try:
-        upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=final_historical, s3_file_path=final_historical)
-        print(f"\n\nSuccessfully Uploaded {final_historical} to S3!\n\n")
-    except Exception as e:
-        print(f'\nFail to upload {final_historical}\n')
-        print(e)
+#     # Stage historical 1 minutes data to s3
+#     try:
+#         upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=final_historical, s3_file_path=final_historical)
+#         print(f"\n\nSuccessfully Uploaded {final_historical} to S3!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to upload {final_historical}\n')
+#         print(e)
     
-    # stage coins_data info to s3
+#     # stage coins_data info to s3
     
-    try:
-        upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=coin_path, s3_file_path=coin_path)
-        print(f"\nSuccessfully Uploaded {coin_path} to S3!\n")
-    except Exception as e:
-        print(f'\nFail to upload {coin_path}\n')
-        print(e)
+#     try:
+#         upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=coin_path, s3_file_path=coin_path)
+#         print(f"\nSuccessfully Uploaded {coin_path} to S3!\n")
+#     except Exception as e:
+#         print(f'\nFail to upload {coin_path}\n')
+#         print(e)
     
-    # stage coin market data into s3
-    try:
-        upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=top_coins_path, s3_file_path=top_coins_path)
-        print(f"\n\nSuccessfully Uploaded {top_coins_path} to S3!\n\n")
-    except Exception as e:
-        print(f'\nFail to upload {top_coins_path}\n')
-        print(e)
+#     # stage coin market data into s3
+#     try:
+#         upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=top_coins_path, s3_file_path=top_coins_path)
+#         print(f"\n\nSuccessfully Uploaded {top_coins_path} to S3!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to upload {top_coins_path}\n')
+#         print(e)
     
-    # stage coin exchange path into s3
-    try:
-        upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=coin_exchange_path, s3_file_path=coin_exchange_path)
-        print(f"\n\nSuccessfully Uploaded {coin_exchange_path} to S3!\n\n")
-    except Exception as e:
-        print(f'\nFail to upload {coin_exchange_path}\n')
-        print(e)
+#     # stage coin exchange path into s3
+#     try:
+#         upload_to_s3(bucketname=c.S3_BUCKET_NAME, local_file_path=coin_exchange_path, s3_file_path=coin_exchange_path)
+#         print(f"\n\nSuccessfully Uploaded {coin_exchange_path} to S3!\n\n")
+#     except Exception as e:
+#         print(f'\nFail to upload {coin_exchange_path}\n')
+#         print(e)
         
 
-    with open('database/data_result_output.py', 'w') as f:
-        with redirect_stdout(f):
-            print(f"exchange_data_s3_result={exchange_data.shape}")
-            print(f"coin_requests_s3_result={coin_requests.shape}")
-            print(f"top_coins_s3_result={top_coins.shape}")
-            print(f"historical_s3_result={frame.shape}")
+#     with open('database/data_result_output.py', 'w') as f:
+#         with redirect_stdout(f):
+#             print(f"exchange_data_s3_result={exchange_data.shape}")
+#             print(f"coin_requests_s3_result={coin_requests.shape}")
+#             print(f"top_coins_s3_result={top_coins.shape}")
+#             print(f"historical_s3_result={frame.shape}")
             
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
